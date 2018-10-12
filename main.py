@@ -2,7 +2,7 @@ from telebot import types
 from telebot.types import Message
 import telebot
 
-TOKEN ='510631047:AAH-SzsULp-731qzkJ2jbizC_rbTyIqt9ww'
+TOKEN =''
 
 bot = telebot.TeleBot(TOKEN)
 
