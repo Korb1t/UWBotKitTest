@@ -1,28 +1,39 @@
-from telebot.types import Message
 from telebot import types
+from telebot.types import Message
 import telebot
 
-TOKEN;
+TOKEN ='510631047:AAH-SzsULp-731qzkJ2jbizC_rbTyIqt9ww'
 
 bot = telebot.TeleBot(TOKEN)
+
+def get_title(chat):
+    if chat.title:
+        return chat.title
+    else:
+        return chat.username
 
 def parse_db(file):
     f = open(file,'r')
     r = f.readlines()
     for i in range(len(r)):
-        r[i] = r[i].replace('\n','')
+        tmp = r[i].replace('\n','').split(';')
+        print(tmp)
+        #r[i] = {'id' : tmp[0], 'title':tmp[1] }
     return r
 
-#db = parse_db('db.txt')
+print(parse_db('db.txt'))
+
 
 @bot.message_handler(commands=['start', 'help', 'register'])
 def send_welcome(message: Message):
     bot.send_message(message.chat.id, 'Hello, my name is dodislav bot. I can send messages to any group I am in.')
     f = open('db.txt','a')
-    if str(message.chat.id) in parse_db('db.txt'):
+    db = parse_db('db.txt')
+    dc = {'id':message.chat.id,'title':get_title(message.chat)}
+    if str(message.chat.id) in db:
         bot.send_message(message.chat.id, 'you are already registered')
     else:
-        f.write(str(message.chat.id) + '\n')
+        f.write(str(message.chat.id) + ';' + get_title(message.chat) + '\n')
         bot.send_message(message.chat.id, 'your chat successfuly registered')
 
 
@@ -60,6 +71,15 @@ def unregister(message):
     else:
         bot.send_message(message.chat.id, 'This chat is not registered')
 
+
+@bot.message_handler(commands=['sendtogroup'])
+def sendtogroup(message):
+    markup = types.ReplyKeyboardMarkup()
+    itembtn = []
+    for i in range(len(parse_db('db.txt'))):
+        itembtn[i] = types.KeyboardButton()
+        markup.row(itembtn[i])
+    bot.send_message(message.chat.id, "Choose reciever:", reply_markup=markup)
 
 #@bot.message_handler(commands=['scrap'])
 #def scrap(message):
