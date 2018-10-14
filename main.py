@@ -26,9 +26,27 @@ print('------------------------------')
 print(parse_db('db.txt'))
 
 
-@bot.message_handler(commands=['start', 'help', 'register'])
+@bot.message_handler(commands=['start', 'help'])
 def send_welcome(message: Message):
     bot.send_message(message.chat.id, 'Hello, my name is dodislav bot. I can send messages to any group I am in.')
+    f = open('db.txt','a')
+    db = parse_db('db.txt')
+    id = message.chat.id
+
+    new_user = True
+    for pg in db:
+        if pg['id'] == str(id):
+            new_user = False
+            break
+
+    if not new_user:
+        pass
+    else:
+        f.write(str(message.chat.id) + ';' + get_title(message.chat) + '\n')
+    f.close()
+
+@bot.message_handler(commands=['register'])
+def reg_func(message: Message):
     f = open('db.txt','a')
     db = parse_db('db.txt')
     id = message.chat.id
@@ -46,12 +64,6 @@ def send_welcome(message: Message):
         bot.send_message(message.chat.id, 'your chat successfuly registered')
 
     f.close()
-
-@bot.message_handler(commands=['register'])
-def reg_func(message):
-    for user in parse_db('db.txt'):
-        bot.send_message(int(user['id']), message.text.replace('/sendtoall ', ''))
-
 
 @bot.message_handler(content_types=['new_chat_members'])
 def send_wel(message :Message):
@@ -92,11 +104,19 @@ def unregister(message):
 def sendtogroup(message):
     markup = types.ReplyKeyboardMarkup()
     itembtn = []
-    for i in range(len(parse_db('db.txt'))):
-        itembtn[i] = types.KeyboardButton()
+    users = parse_db('db.txt')
+    for i in range(len(users)):
+        itembtn[i] = types.KeyboardButton(users[i]['title'])
         markup.row(itembtn[i])
     bot.send_message(message.chat.id, "Choose reciever:", reply_markup=markup)
 
+
+@bot.message_handler(content_types=['text'])
+def sendtousername(message):
+    for user in parse_db('db.txt'):
+        if message.text == user['title']:
+            markup = types.ForceReply(selective=False)
+            bot.send_message(message.chat.id, 'What you want to send')
 #@bot.message_handler(commands=['scrap'])
 #def scrap(message):
 
