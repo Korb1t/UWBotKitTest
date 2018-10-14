@@ -18,7 +18,7 @@ def parse_db(file):
     for i in range(len(r)):
         tmp = r[i].replace('\n','').split(';')
         print(tmp)
-        #r[i] = {'id' : tmp[0], 'title':tmp[1] }
+        r[i] = {'id' : tmp[0], 'title':tmp[1] }
     return r
 
 print(parse_db('db.txt'))
