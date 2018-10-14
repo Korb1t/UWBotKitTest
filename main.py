@@ -47,6 +47,11 @@ def send_welcome(message: Message):
 
     f.close()
 
+@bot.message_handler(commands=['register'])
+def reg_func(message):
+    for user in parse_db('db.txt'):
+        bot.send_message(int(user['id']), message.text.replace('/sendtoall ', ''))
+
 
 @bot.message_handler(content_types=['new_chat_members'])
 def send_wel(message :Message):
