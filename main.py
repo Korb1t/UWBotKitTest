@@ -20,9 +20,10 @@ def parse_db(file):
     for i in range(len(r)):
         tmp = r[i].replace('\n','').split(';')
         print(tmp)
-        #r[i] = {'id' : tmp[0], 'title':tmp[1] }
+        r[i] = {'id' : tmp[0], 'title':tmp[1] }
     return r
 
+print('------------------------------')
 print(parse_db('db.txt'))
 
 
@@ -31,12 +32,21 @@ def send_welcome(message: Message):
     bot.send_message(message.chat.id, 'Hello, my name is dodislav bot. I can send messages to any group I am in.')
     f = open('db.txt','a')
     db = parse_db('db.txt')
-    dc = {'id':message.chat.id,'title':get_title(message.chat)}
-    if str(message.chat.id) in db:
+    id = message.chat.id
+
+    new_user = True
+    for pg in db:
+        if pg['id'] == str(id):
+            new_user = False
+            break
+
+    if not new_user:
         bot.send_message(message.chat.id, 'you are already registered')
     else:
         f.write(str(message.chat.id) + ';' + get_title(message.chat) + '\n')
         bot.send_message(message.chat.id, 'your chat successfuly registered')
+
+    f.close()
 
 
 @bot.message_handler(content_types=['new_chat_members'])
