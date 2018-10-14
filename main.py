@@ -6,9 +6,7 @@ t = open('token.txt','r')
 TOKEN = t.readline()
 t.close()
 
-
 bot = telebot.TeleBot(TOKEN)
-
 
 def get_title(chat):
     if chat.title:
@@ -16,16 +14,15 @@ def get_title(chat):
     else:
         return chat.username
 
-
 def parse_db(file):
     f = open(file,'r')
     r = f.readlines()
     for i in range(len(r)):
         tmp = r[i].replace('\n','').split(';')
-        print(tmp)
         r[i] = {'id' : tmp[0], 'title':tmp[1] }
     return r
 
+print('------------------------------')
 print(parse_db('db.txt'))
 
 
@@ -34,12 +31,21 @@ def send_welcome(message: Message):
     bot.send_message(message.chat.id, 'Hello, my name is dodislav bot. I can send messages to any group I am in.')
     f = open('db.txt','a')
     db = parse_db('db.txt')
-    dc = {'id':message.chat.id,'title':get_title(message.chat)}
-    if str(message.chat.id) in db:
+    id = message.chat.id
+
+    new_user = True
+    for pg in db:
+        if pg['id'] == str(id):
+            new_user = False
+            break
+
+    if not new_user:
         bot.send_message(message.chat.id, 'you are already registered')
     else:
         f.write(str(message.chat.id) + ';' + get_title(message.chat) + '\n')
         bot.send_message(message.chat.id, 'your chat successfuly registered')
+
+    f.close()
 
 
 @bot.message_handler(content_types=['new_chat_members'])
@@ -49,30 +55,30 @@ def send_wel(message :Message):
 
 @bot.message_handler(commands=['sendtoall'])
 def send_msg_to_all(message):
-    for id in parse_db('db.txt'):
-        bot.send_message(int(id), message.text.replace('/sendtoall ', ''))
+    for user in parse_db('db.txt'):
+        bot.send_message(int(user['id']), message.text.replace('/sendtoall ', ''))
 
 
 @bot.message_handler(commands=['sendtochat'])
 def send_msg_to_group(message):
     for id in parse_db('db.txt'):
-        bot.send_message(int(id), message.text.replace('/sendtochat ', ''))
+        bot.send_message(int('id'), message.text.replace('/sendtochat ', ''))
 
 
 @bot.message_handler(commands=['unregister'])
 def unregister(message):
     bool = False
-    for id in parse_db('db.txt'):
-        if int(id) == message.chat.id:
+    for user in parse_db('db.txt'):
+        if int(user['id']) == message.chat.id:
             bool = True
     if bool:
         db = parse_db('db.txt')
         f = open('db.txt','w')
         bot.send_message(message.chat.id, 'You successfuly unregisted this chat')
-        for id in db:
-            if id != str(message.chat.id):
+        for user in db:
+            if user != str(message.chat.id):
                 print(id)
-                f.write(id + '\n')
+                f.write(user['id'] + ';' + user['title'] +'\n')
     else:
         bot.send_message(message.chat.id, 'This chat is not registered')
 
