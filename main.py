@@ -2,7 +2,9 @@ from telebot import types
 from telebot.types import Message
 import telebot
 
-TOKEN =''
+t = open('token.txt','r')
+TOKEN = t.readline()
+t.close()
 
 bot = telebot.TeleBot(TOKEN)
 
