@@ -2,15 +2,20 @@ from telebot import types
 from telebot.types import Message
 import telebot
 
-TOKEN =''
+t = open('token.txt','r')
+TOKEN = t.readline()
+t.close()
+
 
 bot = telebot.TeleBot(TOKEN)
+
 
 def get_title(chat):
     if chat.title:
         return chat.title
     else:
         return chat.username
+
 
 def parse_db(file):
     f = open(file,'r')
