@@ -8,6 +8,8 @@ t.close()
 
 bot = telebot.TeleBot(TOKEN)
 
+print(bot.get_me())
+
 def get_title(chat):
     if chat.title:
         return chat.title
@@ -39,9 +41,7 @@ def send_welcome(message: Message):
             new_user = False
             break
 
-    if not new_user:
-        pass
-    else:
+    if new_user:
         f.write(str(message.chat.id) + ';' + str(get_title(message.chat)) + '\n')
     f.close()
 
@@ -102,21 +102,29 @@ def unregister(message):
 
 @bot.message_handler(commands=['sendtogroup'])
 def sendtogroup(message):
-    markup = types.ReplyKeyboardMarkup()
-    itembtn = []
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
+    itembtn = None
     users = parse_db('db.txt')
     for i in range(len(users)):
-        itembtn[i] = types.KeyboardButton(users[i]['title'])
-        markup.row(itembtn[i])
+        itembtn = types.KeyboardButton(users[i]['title'])
+        markup.add(itembtn)
     bot.send_message(message.chat.id, "Choose reciever:", reply_markup=markup)
 
 
+
 @bot.message_handler(content_types=['text'])
-def sendtousername(message):
+def getgroupname(message):
+    print(message.reply_to_message.from_user, end='@@@')
     for user in parse_db('db.txt'):
         if message.text == user['title']:
             markup = types.ForceReply(selective=False)
-            bot.send_message(message.chat.id, 'What you want to send')
+            bot.send_message(message.chat.id, 'What you want to send',reply_markup=markup)
+
+
+@bot.message_handler(func=lambda message: message.reply_to_message.from_user == bot.get_me())
+def getmsgtosend(message: Message):
+    bot.send_message(message.caht.id, 'True')
+
 #@bot.message_handler(commands=['scrap'])
 #def scrap(message):
 
