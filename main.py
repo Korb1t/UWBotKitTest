@@ -49,7 +49,7 @@ def getmsgtosend(message: Message):
         print(get_id_by_title(title))
         if get_id_by_title(title) != None:
             bot.send_message(get_id_by_title(title), message.text)
-            print('>>>Mуssage sent to ' + title + " and says:" + message.text)
+            print('>>>Message sent to ' + title + " and says:" + message.text)
 
 
 
