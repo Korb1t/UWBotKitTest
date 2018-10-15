@@ -114,16 +114,17 @@ def sendtogroup(message):
 
 @bot.message_handler(content_types=['text'])
 def getgroupname(message):
-    print(message.reply_to_message.from_user, end='@@@')
     for user in parse_db('db.txt'):
         if message.text == user['title']:
             markup = types.ForceReply(selective=False)
             bot.send_message(message.chat.id, 'What you want to send',reply_markup=markup)
 
 
-@bot.message_handler(func=lambda message: message.reply_to_message.from_user == bot.get_me())
+@bot.message_handler(func=lambda message: message.from_user == bot.get_me())
 def getmsgtosend(message: Message):
-    bot.send_message(message.caht.id, 'True')
+        for user in parse_db('db.txt'):
+            if user['title'] in parse_db('db.txt'):
+                bot.send_message(int(user['title']), message.text)
 
 #@bot.message_handler(commands=['scrap'])
 #def scrap(message):
