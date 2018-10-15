@@ -8,14 +8,6 @@ t.close()
 
 bot = telebot.TeleBot(TOKEN)
 
-print(bot.get_me())
-
-def get_title(chat):
-    if chat.title:
-        return chat.title
-    else:
-        return chat.username
-
 def parse_db(file):
     f = open(file,'r')
     r = f.readlines()
@@ -24,8 +16,41 @@ def parse_db(file):
         r[i] = {'id' : tmp[0], 'title':tmp[1] }
     return r
 
-print('------------------------------')
+print('>>>Debug: Bot Started')
+print('>>>DataBase:')
 print(parse_db('db.txt'))
+print(">>>End----------------------------------------------")
+
+def get_title(chat):
+    if chat.title:
+        return chat.title
+    else:
+        return chat.username
+
+def get_id_by_title(title):
+    #print(title)
+    for user in parse_db('db.txt'):
+        #print(user['title'])
+        if str(user['title']) == str(title):
+            return int(user['id'])
+    return None
+
+def get_title_by_id(id):
+    for user in parse_db('db.txt'):
+        if user['id'] == id:
+            return user['title']
+    return None
+
+
+@bot.message_handler(func=lambda message: message.reply_to_message != None)
+def getmsgtosend(message: Message):
+    if message.reply_to_message.text.startswith('What do you want to send to'):
+        title = message.reply_to_message.text.replace('What do you want to send to ','')
+        print(get_id_by_title(title))
+        if get_id_by_title(title) != None:
+            bot.send_message(get_id_by_title(title), message.text)
+            print('>>>MEssage sent to ' + title + "and says:" + message.text)
+
 
 
 @bot.message_handler(commands=['start', 'help'])
@@ -106,29 +131,18 @@ def sendtogroup(message):
     itembtn = None
     users = parse_db('db.txt')
     for i in range(len(users)):
-        itembtn = types.KeyboardButton(users[i]['id'])
+        itembtn = types.KeyboardButton(users[i]['title'])
         markup.add(itembtn)
     bot.send_message(message.chat.id, "Choose reciever:", reply_markup=markup)
-
 
 
 @bot.message_handler(content_types=['text'])
 def getgroupname(message):
     for user in parse_db('db.txt'):
-        if message.text == user['id']:
+        if message.text == user['title']:
             markup = types.ForceReply(selective=False)
-            bot.send_message(message.chat.id, 'What do you want to send?',reply_markup=markup)
+            bot.send_message(message.chat.id, 'What do you want to send to ' + user['title'],reply_markup=markup)
 
-
-@bot.message_handler(func=lambda message: message.reply_to_message_id == bot.get_updates())
-def getmsgtosend(message: Message):
-        for user in parse_db('db.txt'):
-            if user['id'] in parse_db('db.txt'):
-                message.text.id == user['id']
-                bot.send_message(user['id'], message.text)
-
-#@bot.message_handler(commands=['scrap'])
-#def scrap(message):
 
 
 
