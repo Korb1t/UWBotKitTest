@@ -42,7 +42,7 @@ def send_welcome(message: Message):
     if not new_user:
         pass
     else:
-        f.write(str(message.chat.id) + ';' + get_title(message.chat) + '\n')
+        f.write(str(message.chat.id) + ';' + str(get_title(message.chat)) + '\n')
     f.close()
 
 @bot.message_handler(commands=['register'])
@@ -60,7 +60,7 @@ def reg_func(message: Message):
     if not new_user:
         bot.send_message(message.chat.id, 'you are already registered')
     else:
-        f.write(str(message.chat.id) + ';' + get_title(message.chat) + '\n')
+        f.write(str(message.chat.id) + ';' + str(get_title(message.chat)) + '\n')
         bot.send_message(message.chat.id, 'your chat successfuly registered')
 
     f.close()
