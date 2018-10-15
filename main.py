@@ -102,11 +102,11 @@ def unregister(message):
 
 @bot.message_handler(commands=['sendtogroup'])
 def sendtogroup(message):
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=5)
     itembtn = None
     users = parse_db('db.txt')
     for i in range(len(users)):
-        itembtn = types.KeyboardButton(users[i]['title'])
+        itembtn = types.KeyboardButton(users[i]['id'])
         markup.add(itembtn)
     bot.send_message(message.chat.id, "Choose reciever:", reply_markup=markup)
 
@@ -115,16 +115,17 @@ def sendtogroup(message):
 @bot.message_handler(content_types=['text'])
 def getgroupname(message):
     for user in parse_db('db.txt'):
-        if message.text == user['title']:
+        if message.text == user['id']:
             markup = types.ForceReply(selective=False)
-            bot.send_message(message.chat.id, 'What you want to send',reply_markup=markup)
+            bot.send_message(message.chat.id, 'What do you want to send?',reply_markup=markup)
 
 
-@bot.message_handler(func=lambda message: message.from_user == bot.get_me())
+@bot.message_handler(func=lambda message: message.reply_to_message_id == bot.get_updates())
 def getmsgtosend(message: Message):
         for user in parse_db('db.txt'):
-            if user['title'] in parse_db('db.txt'):
-                bot.send_message(int(user['title']), message.text)
+            if user['id'] in parse_db('db.txt'):
+                message.text.id == user['id']
+                bot.send_message(user['id'], message.text)
 
 #@bot.message_handler(commands=['scrap'])
 #def scrap(message):
